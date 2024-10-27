@@ -6,17 +6,37 @@ export default function SignUp() {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [phoneError, setPhoneError] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
+    const { id, value } = e.target;
+
+    // Phone number validation logic
+    if (id === 'phone') {
+      const phoneNumber = value.replace(/\D/g, ''); // Remove non-numeric characters
+      if (!/^[1-9][0-9]{9}$/.test(phoneNumber)) {
+        setPhoneError("Please enter a valid 10-digit phone number without the initial '0'");
+      } else {
+        setPhoneError(null);
+      }
+
+      setFormData({
+        ...formData,
+        [id]: phoneNumber,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [id]: value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (phoneError) return; // Prevent form submission if phone error exists
+
     try {
       setLoading(true);
       const res = await fetch('/api/auth/signup', {
@@ -64,6 +84,19 @@ export default function SignUp() {
             onChange={handleChange}
             required
           />
+          <div className='flex items-center border-b-2 border-gray-300 p-2 focus-within:border-blue-500 transition duration-200'>
+            <span className='text-gray-500 pr-2'>+92</span>
+            <input
+              type='text'
+              placeholder='Phone number'
+              className='focus:outline-none flex-grow'
+              id='phone'
+              maxLength="10" // Restrict input to 10 digits
+              onChange={handleChange}
+              required
+            />
+          </div>
+          {phoneError && <p className='text-red-500 text-sm'>{phoneError}</p>}
           <input
             type='password'
             placeholder='Password'

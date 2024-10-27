@@ -50,6 +50,10 @@ const listingSchema = new mongoose.Schema(
       type: Array,
       required: true,
     },
+    phone:{
+      type:Number,
+      required:true
+    },
     userRef: {
       type: String,
       required: true,
