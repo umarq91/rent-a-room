@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore from 'swiper';
-import { useSelector } from 'react-redux';
-import { Navigation } from 'swiper/modules';
-import 'swiper/css/bundle';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import SwiperCore from "swiper";
+import { useSelector } from "react-redux";
+import { Navigation } from "swiper/modules";
+import "swiper/css/bundle";
 import {
   FaBath,
   FaBed,
@@ -13,8 +13,9 @@ import {
   FaParking,
   FaShare,
   FaWhatsapp,
-} from 'react-icons/fa';
-import Contact from '../components/Contact';
+} from "react-icons/fa";
+import Contact from "../components/Contact";
+import BookingModal from "../components/BookingModal";
 
 export default function Listing() {
   SwiperCore.use([Navigation]);
@@ -25,13 +26,16 @@ export default function Listing() {
   const [contact, setContact] = useState(false);
   const params = useParams();
   const { currentUser } = useSelector((state) => state.user);
+  const [bookingDetailsModal, setBookingDetailsModal] = useState(false);
+
+  const isOwner = currentUser?._id === listing?.userRef;
 
   useEffect(() => {
     const fetchListing = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/listing/get/${params.listingId}`);
-        
+        const res = await fetch(`/api/listing/get/${params?.listingId}`);
+
         const data = await res.json();
         if (data.success === false) {
           setError(true);
@@ -48,7 +52,7 @@ export default function Listing() {
       }
     };
     fetchListing();
-  }, [params.listingId]);
+  }, [params?.listingId]);
 
   return (
     <main>
@@ -65,7 +69,7 @@ export default function Listing() {
                   className="h-[550px]"
                   style={{
                     background: `url(${url}) center no-repeat`,
-                    backgroundSize: 'cover',
+                    backgroundSize: "cover",
                   }}
                 ></div>
               </SwiperSlide>
@@ -90,11 +94,11 @@ export default function Listing() {
           )}
           <div className="flex flex-col max-w-4xl mx-auto p-3 my-7 gap-4">
             <p className="text-2xl font-semibold">
-              {listing.name} - ${' '}
+              {listing.name} - ${" "}
               {listing.offer
-                ? listing.discountPrice.toLocaleString('en-US')
-                : listing.regularPrice.toLocaleString('en-US')}
-              {listing.type === 'rent' && ' / month'}
+                ? listing.discountPrice.toLocaleString("en-US")
+                : listing.regularPrice.toLocaleString("en-US")}
+              {listing.type === "rent" && " / month"}
             </p>
             <p className="flex items-center mt-6 gap-2 text-slate-600 text-sm">
               <FaMapMarkerAlt className="text-green-700" />
@@ -102,7 +106,7 @@ export default function Listing() {
             </p>
             <div className="flex gap-4">
               <p className="bg-red-900 w-full max-w-[200px] text-white text-center p-1 rounded-md">
-                {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
+                {listing.type === "rent" ? "For Rent" : "For Sale"}
               </p>
               {listing.offer && (
                 <p className="bg-green-900 w-full max-w-[200px] text-white text-center p-1 rounded-md">
@@ -129,28 +133,28 @@ export default function Listing() {
               </li>
               <li className="flex items-center gap-1 whitespace-nowrap ">
                 <FaParking className="text-lg" />
-                {listing.parking ? 'Parking spot' : 'No Parking'}
+                {listing.parking ? "Parking spot" : "No Parking"}
               </li>
               <li className="flex items-center gap-1 whitespace-nowrap ">
                 <FaChair className="text-lg" />
-                {listing.furnished ? 'Furnished' : 'Unfurnished'}
+                {listing.furnished ? "Furnished" : "Unfurnished"}
               </li>
             </ul>
             <div className="flex gap-4">
-  {/* WhatsApp Button */}
-  <a
-    href={`https://wa.me/0${listing.phone}?text=${encodeURIComponent(
-      `Hi, I'm interested in the ${listing.type === 'rent' ? 'rental' : 'sale'} property "${listing.name}" located at ${listing.address}. The price is ${listing.offer ? `$${listing.discountPrice}` : `$${listing.regularPrice}`} ${listing.type === 'rent' ? 'per month' : ''}. Please provide more details.`
-    )}`}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="bg-green-500 text-white w-full max-w-[200px] text-center p-2 rounded-md flex justify-center items-center gap-2 hover:bg-green-600 transition duration-300"
-  >
-    <FaWhatsapp className="text-lg" />
-    WhatsApp
-  </a>
-</div>
-
+              {/* Modal Button */}
+              {!isOwner ? (
+                <button
+                  className="bg-green-700 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-3"
+                  onClick={() => setBookingDetailsModal(true)}
+                >
+                  Book Now
+                </button>
+              ):(
+                <div className="bg-green-700 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-3">
+                  You're the owner
+                  </div>
+              )}
+            </div>
 
             {currentUser && listing.userRef !== currentUser._id && !contact && (
               <button
@@ -161,10 +165,15 @@ export default function Listing() {
               </button>
             )}
             {contact && <Contact listing={listing} />}
+            <BookingModal
+              isOpen={bookingDetailsModal}
+              onClose={() => setBookingDetailsModal(false)}
+              listingId={listing?._id}
+              userId={currentUser?._id}
+            />
           </div>
         </div>
       )}
     </main>
   );
 }
- 

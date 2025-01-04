@@ -18,6 +18,7 @@ import {
 } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import AdminBookings from '../components/AdminBookings';
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -29,6 +30,7 @@ export default function Profile() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
+  const [isBookingModalOpen,setIsBookingModalOpen] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -240,6 +242,11 @@ export default function Profile() {
         <p className='text-green-600 mt-5'>
           {updateSuccess ? 'User updated successfully!' : ''}
         </p>
+        <button
+        onClick={()=>setIsBookingModalOpen(true)}
+        className='bg-gray-300 my-2 text-gray-700 rounded-lg py-2 w-full hover:bg-gray-400 transition duration-200'>
+          Show Bookings
+        </button>
         <button onClick={handleShowListings} className='bg-gray-300 text-gray-700 rounded-lg py-2 w-full hover:bg-gray-400 transition duration-200'>
           Show Listings
         </button>
@@ -280,6 +287,11 @@ export default function Profile() {
           </div>
         )}
       </div>
+      <AdminBookings 
+      isOpen={isBookingModalOpen}
+      onClose={()=>setIsBookingModalOpen(false)}
+      userId={currentUser._id}
+      />
     </div>
   );
 }
