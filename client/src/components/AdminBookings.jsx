@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
 const AdminBookings = ({ userId, isOpen, onClose }) => {
   const [bookings, setBookings] = useState([]);
@@ -17,12 +17,18 @@ const AdminBookings = ({ userId, isOpen, onClose }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`/api/bookings/admin/${userId}`);
+      const res = await fetch(`/api/bookings/admin/${userId}`);
+      const  response = await res.json();
       console.log(response);
+      
+      if (response.status == 200) {
+        setBookings(response.data.data);
+      }
 
-      setBookings(response.data.data);
     } catch (err) {
-      setError('Failed to fetch bookings. Please try again later.');
+      setError(
+        err.message || "Failed to fetch bookings. Please try again later."
+      );
     } finally {
       setLoading(false);
     }
@@ -32,8 +38,8 @@ const AdminBookings = ({ userId, isOpen, onClose }) => {
     const message = `Hello, I have a query about my booking:
 - Name: ${booking.name}
 - Email: ${booking.email}
-- Phone: ${booking.phone || 'N/A'}
-- Post: ${booking?.listingId?.name || 'N/A'}
+- Phone: ${booking.phone || "N/A"}
+- Post: ${booking?.listingId?.name || "N/A"}
 - Booking Date: ${new Date(booking?.bookingDate).toLocaleDateString()}`;
     return `https://wa.me/${booking.phone}?text=${encodeURIComponent(message)}`;
   };
@@ -41,8 +47,8 @@ const AdminBookings = ({ userId, isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
+    <div className="fixed l  inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white h-[80vh] overflow-y-scroll rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
         <button
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
           onClick={onClose}
@@ -67,12 +73,13 @@ const AdminBookings = ({ userId, isOpen, onClose }) => {
                 className="border border-gray-300 rounded-lg p-4 shadow-sm hover:shadow-md transition"
               >
                 <Link to={`/listing/${booking?.listingId?._id}`}>
-                <p className="text-sm font-medium text-gray-700 underline">
-                  <strong>Post:</strong> {booking?.listingId?.name}
-                </p>
+                  <p className="text-sm font-medium text-gray-700 underline">
+                    <strong>Post:</strong> {booking?.listingId?.name}
+                  </p>
                 </Link>
                 <p className="text-sm text-gray-600">
-                  <strong>Date:</strong> {new Date(booking?.bookingDate).toLocaleDateString()}
+                  <strong>Date:</strong>{" "}
+                  {new Date(booking?.bookingDate).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong>Name:</strong> {booking?.name}
@@ -81,7 +88,7 @@ const AdminBookings = ({ userId, isOpen, onClose }) => {
                   <strong>Email:</strong> {booking.email}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>Phone:</strong> {booking.phone || 'N/A'}
+                  <strong>Phone:</strong> {booking.phone || "N/A"}
                 </p>
                 <a
                   href={generateWhatsAppLink(booking)}

@@ -156,15 +156,7 @@ export default function Listing() {
               )}
             </div>
 
-            {currentUser && listing.userRef !== currentUser._id && !contact && (
-              <button
-                onClick={() => setContact(true)}
-                className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-3"
-              >
-                Contact landlord
-              </button>
-            )}
-            {contact && <Contact listing={listing} />}
+         
             <BookingModal
               isOpen={bookingDetailsModal}
               onClose={() => setBookingDetailsModal(false)}

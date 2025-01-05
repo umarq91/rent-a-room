@@ -7,7 +7,6 @@ const router = express.Router();
 // Add a booking
 router.post("/", async (req, res) => {
   try {
-
     const { name, email, phone, bookingDate, listingId } = req.body;
 
     const listing = await Listing.findById(listingId);
@@ -24,7 +23,7 @@ router.post("/", async (req, res) => {
       email,
       phone,
       bookingDate: new Date(bookingDate),
-      userId:listing.userRef,
+      userId: listing.userRef,
       listingId,
     });
 
@@ -100,7 +99,7 @@ router.get("/admin/:adminId", async (req, res) => {
 
     if (!listings.length) {
       return res
-        .status(404)
+        .status(400)
         .json({ message: "No listings found for this admin" });
     }
 
